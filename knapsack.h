@@ -8,23 +8,30 @@ public:
 	knapsack(const knapsack &);
 	int getCost(int) const;
 	int getValue(int) const;
+	double getRatio(int) const;
 	int getCost() const;
 	int getValue() const;
 	int getNumObjects() const;
 	int getCostLimit() const;
 	void printSolution();
+	void printSolution(string);
 	void select(int);
 	void unSelect(int);
 	bool isSelected(int) const;
+	void setLevel(int);
+	int getLevel();
+	double bound();
 
 private:
 	int numObjects;
 	int costLimit;
 	vector<int> value;
 	vector<int> cost;
+	vector<double> ratio;
 	vector<bool> selected;
 	int totalValue;
 	int totalCost;
+	int level;
 };
 
 knapsack::knapsack(ifstream &fin)
@@ -40,6 +47,7 @@ knapsack::knapsack(ifstream &fin)
 
 	value.resize(n);
 	cost.resize(n);
+	ratio.resize(n);
 	selected.resize(n);
 
 	for (int i = 0; i < n; i++)
@@ -47,9 +55,11 @@ knapsack::knapsack(ifstream &fin)
 		fin >> j >> v >> c;
 		value[j] = v;
 		cost[j] = c;
+		ratio[j] = (double)v / (double)c;
 		unSelect(j);
 	}
 
+	level = 0;
 	totalValue = 0;
 	totalCost = 0;
 }
@@ -72,6 +82,7 @@ knapsack::knapsack(const knapsack &k)
 	{
 		value[i] = k.getValue(i);
 		cost[i] = k.getCost(i);
+		ratio[i] = k.getRatio(i);
 		if (k.isSelected(i))
 			select(i);
 		else
@@ -93,8 +104,11 @@ int knapsack::getCostLimit() const
 int knapsack::getValue(int i) const
 // Return the value of the ith object.
 {
-	if (i < 0 || i >= getNumObjects())
+	if (i < 0 || i >= getNumObjects()) {
+		cout << "getValue Error: i = " << i << endl;
+		system("pause");
 		throw rangeError("Bad value in knapsack::getValue");
+	}
 
 	return value[i];
 }
@@ -106,6 +120,15 @@ int knapsack::getCost(int i) const
 		throw rangeError("Bad value in knapsack::getCost");
 
 	return cost[i];
+}
+
+double knapsack::getRatio(int i) const
+// Return the value to cost ratio of the ith object.
+{
+	if (i < 0 || i >= getNumObjects())
+		throw rangeError("Bad value in knapsack::getRatio");
+
+	return ratio[i];
 }
 
 int knapsack::getCost() const
@@ -123,8 +146,8 @@ int knapsack::getValue() const
 ostream &operator<<(ostream &ostr, const knapsack &k)
 // Print all information about the knapsack.
 {
-	ostr << "------------------------------------------------" << endl;
-	ostr << "Num objects: " << k.getNumObjects() << " Cost Limit: " << k.getCostLimit() << endl;
+	cout << "------------------------------------------------" << endl;
+	cout << "Num objects: " << k.getNumObjects() << " Cost Limit: " << k.getCostLimit() << endl;
 
 	int totalValue = 0;
 	int totalCost = 0;
@@ -158,8 +181,26 @@ void knapsack::printSolution()
 	for (int i = 0; i < getNumObjects(); i++)
 		if (isSelected(i))
 			cout << i << "  " << getValue(i) << " " << getCost(i) << endl;
-
 	cout << endl;
+}
+
+void knapsack::printSolution(string out)
+// Prints out the solution to file.
+{
+	ofstream myfile;
+	myfile.open(out.c_str());
+
+	myfile << "------------------------------------------------" << endl;
+
+	myfile << "Total value: " << getValue() << endl;
+	myfile << "Total cost: " << getCost() << endl << endl;
+
+	// Print out objects in the solution
+	for (int i = 0; i < getNumObjects(); i++)
+		if (isSelected(i))
+			myfile << i << "  " << getValue(i) << " " << getCost(i) << endl;
+	myfile << endl;
+	myfile.close();
 }
 
 ostream &operator<<(ostream &ostr, vector<bool> v)
@@ -168,7 +209,7 @@ ostream &operator<<(ostream &ostr, vector<bool> v)
 	for (int i = 0; i < v.size(); i++)
 		cout << v[i] << endl;
 
-	return ostr
+	return ostr;
 }
 
 void knapsack::select(int i)
@@ -202,8 +243,35 @@ void knapsack::unSelect(int i)
 bool knapsack::isSelected(int i) const
 // Return true if object i is currently selected, and false otherwise.
 {
-	if (i < 0 || i >= getNumObjects())
+	if (i < 0 || i >= getNumObjects()) {
+		cout << "isSelected Error: i = " << i << endl;
+		system("pause");
 		throw rangeError("Bad value in knapsack::getValue");
+	}
 
 	return selected[i];
+}
+
+void knapsack::setLevel(int l) {
+	level = l;
+}
+
+int knapsack::getLevel() {
+	return level;
+}
+
+double knapsack::bound() {
+	double bound = 0;
+	int cost = 0;
+	
+	for (int i = 0; i < level; i++) {
+		if (selected[i]) {
+			bound += value[i];
+			cost += cost[i];
+		}
+	}
+
+	bound += (costLimit - cost) * ratio[level + 1];
+
+	return bound;
 }

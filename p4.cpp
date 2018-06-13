@@ -15,6 +15,8 @@ using namespace std;
 #include "d_matrix.h"
 #include "knapsack.h"
 
+void branchAndBound(knapsack &k, int);
+
 int main()
 {
    char x;
@@ -42,7 +44,7 @@ int main()
       cout << "Reading knapsack instance" << endl;
       knapsack k(fin);
 
-      exhaustiveKnapsack(k, 600);
+      branchAndBound(k, 600);
 
       cout << endl << "Best solution" << endl;
       k.printSolution();
@@ -57,4 +59,8 @@ int main()
    {
       cout << ex.what() << endl; exit(1);
    }
+}
+
+void branchAndBound(knapsack &k, int t) {
+
 }
