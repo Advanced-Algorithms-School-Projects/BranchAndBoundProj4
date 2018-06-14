@@ -19,8 +19,8 @@ public:
 	void unSelect(int);
 	bool isSelected(int) const;
 	void setLevel(int);
-	int getLevel();
-	double bound();
+	int getLevel() const;
+	double bound(vector<int>);
 
 private:
 	int numObjects;
@@ -72,9 +72,12 @@ knapsack::knapsack(const knapsack &k)
 	value.resize(n);
 	cost.resize(n);
 	selected.resize(n);
+	ratio.resize(n);
+
 	numObjects = k.getNumObjects();
 	costLimit = k.getCostLimit();
-
+	level = k.getLevel();
+	
 	totalCost = 0;
 	totalValue = 0;
 
@@ -116,18 +119,22 @@ int knapsack::getValue(int i) const
 int knapsack::getCost(int i) const
 // Return the cost of the ith object.
 {
-	if (i < 0 || i >= getNumObjects())
+	if (i < 0 || i >= getNumObjects()) {
+		cout << "getCost Error: i = " << i << endl;
+		system("pause");
 		throw rangeError("Bad value in knapsack::getCost");
-
+	}
 	return cost[i];
 }
 
 double knapsack::getRatio(int i) const
 // Return the value to cost ratio of the ith object.
 {
-	if (i < 0 || i >= getNumObjects())
+	if (i < 0 || i >= getNumObjects()) {
+		cout << "getRatio Error: i = " << i << endl;
+		system("pause");
 		throw rangeError("Bad value in knapsack::getRatio");
-
+	}
 	return ratio[i];
 }
 
@@ -215,8 +222,11 @@ ostream &operator<<(ostream &ostr, vector<bool> v)
 void knapsack::select(int i)
 // Select object i.
 {
-	if (i < 0 || i >= getNumObjects())
+	if (i < 0 || i >= getNumObjects()) {
+		cout << "select Error: i = " << i << endl;
+		system("pause");
 		throw rangeError("Bad value in knapsack::Select");
+	}
 
 	if (selected[i] == false)
 	{
@@ -256,22 +266,23 @@ void knapsack::setLevel(int l) {
 	level = l;
 }
 
-int knapsack::getLevel() {
+int knapsack::getLevel() const {
 	return level;
 }
 
-double knapsack::bound() {
+double knapsack::bound(vector<int> items) {
 	double bound = 0;
-	int cost = 0;
-	
+	int boundCost = 0;
+
 	for (int i = 0; i < level; i++) {
-		if (selected[i]) {
-			bound += value[i];
-			cost += cost[i];
+		if (selected[items[i]]) {
+			bound += value[items[i]];
+			boundCost += cost[items[i]];
 		}
 	}
 
-	bound += (costLimit - cost) * ratio[level + 1];
-
+	if (level < numObjects) {
+		bound += (costLimit - boundCost) * ratio[items[level]];
+	}
 	return bound;
 }
