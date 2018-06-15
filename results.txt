@@ -8,7 +8,7 @@ firstly calculating the known cost for a particular branch, then adding the
 cost ratio of the next best option multiplied by the remaining cost. The
 algorithm also implemented a depth first approach, which was useful because
 it could more quickly identify possible solutions, and fathoming could occur
-more quickly. The disadvatage of this algorithm is that its worst-case run
+more quickly. The disadvantage  of this algorithm is that its worst-case run
 time is exponential, however, often the algorithm will not run in exponential
 time because many instances of the problem will experience significant fathoming.
 Many instances appeared to run rather quickly. Another advantage to this algorithm 
