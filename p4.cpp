@@ -1,4 +1,5 @@
-// Project 1a: Solving knapsack using exhaustive search
+// Project 4: Branch and bound algorithm
+// Created by Patrick Hanbury and Cassandra Smith
 //
 
 #include <iostream>
@@ -17,7 +18,7 @@ using namespace std;
 #include "knapsack.h"
 
 void branchAndBound(knapsack &k, int t);
-void branchRecursive(knapsack &bestSol, deque<knapsack> &branches, vector<int> items);
+void branchRecursive(knapsack &bestSol, deque<knapsack> &branches, vector<int> items, clock_t startT, int t);
 bool isFathomed(knapsack &k, knapsack &bestSol, vector<int> items);
 void orderKnapsack(knapsack &k, vector<int> &items);
 
@@ -31,7 +32,7 @@ int main()
    // Read the name of the file from the keyboard or
    // hard code it here for testing.
    
-   fileName = "knapsack20.input";
+   fileName = "knapsack28.input";
 
    //cout << "Enter filename" << endl;
    //cin >> fileName;
@@ -48,12 +49,12 @@ int main()
       cout << "Reading knapsack instance" << endl;
       knapsack k(fin);
 	  
-	  system("pause");
+	  //system("pause");
 
       branchAndBound(k, 600);
 
       cout << endl << "Best solution" << endl;
-      k.printSolution();
+      k.printSolution("knapsack28.output");
 	  system("pause");
 
    }    
@@ -68,7 +69,9 @@ int main()
    }
 }
 
+//Branch and bound algorithm for solving knapsack
 void branchAndBound(knapsack &k, int t) {
+	clock_t startTime = clock();
 	deque<knapsack> branches;
 	knapsack bestSol = knapsack(k);
 	vector<int> items;
@@ -80,30 +83,28 @@ void branchAndBound(knapsack &k, int t) {
 	orderKnapsack(k, items);
 
 	branches.push_back(k);
-	branchRecursive(bestSol, branches, items);
+	branchRecursive(bestSol, branches, items, startTime, t);
 
 	k = knapsack(bestSol);
-	system("pause");
 }
 
-void branchRecursive(knapsack &bestSol, deque<knapsack> &branches, vector<int> items) {
-	/*for (int i = 0; i < branches.size(); i++) {
-		cout << "Knapsack " << i << ", Level: " << branches[i].getLevel() << endl;
-		branches[i].printSolution();
-	}*/
-
+//Creates and expands branches recursively
+void branchRecursive(knapsack &bestSol, deque<knapsack> &branches, vector<int> items, clock_t startT, int t) {
 	for (int i = 0; i <= 1; i++) {
+		if (((float)(clock() - startT) / CLOCKS_PER_SEC) >= t) {
+			return;
+		}
+
 		knapsack temp = knapsack(branches.back());
 		temp.setLevel(branches.back().getLevel() + 1);
 
 		if (i == 1) {
 			temp.select(items[temp.getLevel() - 1]);
-
 		}
 		branches.push_back(temp);
 
 		if (!isFathomed(branches.back(), bestSol, items)) {
-			branchRecursive(bestSol, branches, items);
+			branchRecursive(bestSol, branches, items, startT, t);
 		}
 		else {
 			branches.pop_back();		
@@ -113,6 +114,7 @@ void branchRecursive(knapsack &bestSol, deque<knapsack> &branches, vector<int> i
 	return;
 }
 
+//Function to check if a branch is fathomed or not
 bool isFathomed(knapsack &k, knapsack &bestSol, vector<int> items) {
 	if (k.getCost() > k.getCostLimit()) {
 		return true;
@@ -123,18 +125,19 @@ bool isFathomed(knapsack &k, knapsack &bestSol, vector<int> items) {
 		}
 		return true;
 	}
-	else if (k.bound(items) <= bestSol.getValue()) {
-		return true;
-	}
-	else if (k.getLevel() == (k.getNumObjects() - 1)) {
+	else if (k.getLevel() == (k.getNumObjects())) {
 		if (k.getValue() > bestSol.getValue()) {
 			bestSol = knapsack(k);
 		}
 		return true;
 	}
+	else if (k.bound(items) <= bestSol.getValue()) {
+		return true;
+	}
 	return false;
 }
 
+//Orders the items in a knapsack by increasing ratio value
 void orderKnapsack(knapsack &k, vector<int> &items) {
 	int temp, j;
 

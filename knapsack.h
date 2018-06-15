@@ -1,5 +1,5 @@
-// Knapsack class
-// Version f08.1
+// Project 4: Knapsack class
+// 
 
 class knapsack
 {
@@ -262,14 +262,17 @@ bool knapsack::isSelected(int i) const
 	return selected[i];
 }
 
+//Set branch level
 void knapsack::setLevel(int l) {
 	level = l;
 }
 
+//Returns branch level
 int knapsack::getLevel() const {
 	return level;
 }
 
+//Returns an optimistic bound for the current knapsack
 double knapsack::bound(vector<int> items) {
 	double bound = 0;
 	int boundCost = 0;
