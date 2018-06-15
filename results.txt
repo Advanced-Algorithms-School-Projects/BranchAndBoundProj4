@@ -1,0 +1,16 @@
+Project 4 Results
+	Patrick Hanbury & Cassandra Smith
+	June 8th, 2018
+
+The goal of this project was to implement a branch and bound algorithm for
+solving the knapsack problem. The bound portion of the algorithm worked by
+firstly calculating the known cost for a particular branch, then adding the
+cost ratio of the next best option multiplied by the remaining cost. The
+algorithm also implemented a depth first approach, which was useful because
+it could more quickly identify possible solutions, and fathoming could occur
+more quickly. The disadvatage of this algorithm is that its worst-case run
+time is exponential, however, often the algorithm will not run in exponential
+time because many instances of the problem will experience significant fathoming.
+Many instances appeared to run rather quickly. Another advantage to this algorithm 
+is that it will always obtain the optimal solution. As such, it should always
+be used over the exhaustive algorithm.
