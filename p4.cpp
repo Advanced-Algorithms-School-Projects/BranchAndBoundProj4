@@ -32,7 +32,7 @@ int main()
    // Read the name of the file from the keyboard or
    // hard code it here for testing.
    
-   fileName = "knapsack28.input";
+   fileName = "knapsack1024.input";
 
    //cout << "Enter filename" << endl;
    //cin >> fileName;
@@ -54,7 +54,7 @@ int main()
       branchAndBound(k, 600);
 
       cout << endl << "Best solution" << endl;
-      k.printSolution("knapsack28.output");
+      k.printSolution("knapsack1024.output");
 	  system("pause");
 
    }    
